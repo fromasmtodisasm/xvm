@@ -45,6 +45,7 @@ typedef struct vm_t
 {
 	cpu_t *cpu;
 	memory_t *memory;
+	memory_t *stack;
 }vm_t;
 
 typedef bool (*command)(vm_t*);
@@ -54,7 +55,13 @@ void nop(vm_t *vm);
 
 void hlt(vm_t * vm);
 
-void vm_reset(cpu_t * cpu);
+void psh(vm_t * vm);
+
+void pop(vm_t * vm);
+
+void prt(vm_t * vm);
+
+void vm_reset(vm_t * cpu);
 
 void vm_SetProgram(vm_t * vm, uint8_t * program, size_t size);
 
@@ -62,6 +69,6 @@ cpu_t * vm_createCpu();
 
 memory_t * vm_createMemory(uint8_t * ram, size_t size);
 
-vm_t * vm_create();
+vm_t * vm_create(size_t stack_siz);
 
 int vm_run(vm_t * vm);
