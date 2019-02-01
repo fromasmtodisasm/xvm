@@ -5,19 +5,13 @@
 #define PROG_SIZE 128
 typedef uint32_t uint;
 
-int main() {
-
-	vm_t *vm;
-
-	size_t size_of_prog = 256;
-	//uint8_t *program = malloc(PROG_SIZE*sizeof(uint8_t));
-	uint8_t program[PROG_SIZE];
+uint8_t *make_program(size_t size) {
 	int pc = 1;
-	memset(program, 0, PROG_SIZE);
-
 	int res = 0;
 	char *greating = "Hello, World!\n";
+	uint8_t *program = malloc(PROG_SIZE*sizeof(uint8_t));
 
+	memset(program, 0, PROG_SIZE);
 	uint str_offset = PROG_SIZE - strlen(greating) - 1;
 	program[pc++] = 0x2;
 	*((uint*)&(program[pc])) = PROG_SIZE - strlen(greating) - 1;
@@ -26,11 +20,19 @@ int main() {
 	program[str_offset -1] = 0xff;
 	
 	memcpy(&program[str_offset], greating, strlen(greating) + 1);
+	return program;
+}
 
-	memory_t *mem = vm_createMemory(program, PROG_SIZE);
-	vm = vm_create(mem,128);
-	vm_reset(vm);
+int main() {
+	vm_t *vm;
+	int res = -1;
+	uint8_t *program = NULL;
 
-	res = vm_run(vm);
+	if (program = make_program(PROG_SIZE)) {
+		memory_t *mem = vm_createMemory(program, PROG_SIZE);
+		vm = vm_create(mem, 128);
+		vm_reset(vm);
+		res = vm_run(vm);
+	}
 	return  res;
 }
