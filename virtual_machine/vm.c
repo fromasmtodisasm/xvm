@@ -33,7 +33,7 @@ void nop(vm_t *vm) {
 
 void hlt(vm_t *vm) {
 	printf("%d:%s executed\n", vm->cpu->regs[PC], __func__);
-	vm->cpu->is_halt = true;
+	vm->cpu->is_running = false;
 }
 
 void psh(vm_t *vm) {
@@ -49,12 +49,12 @@ void pop(vm_t *vm) {
 void mov(vm_t *vm) {
 	cpu_t *cpu = vm->cpu;
 	uint8_t operands = ++cpu->regs[PC];
-	uint8_t src, dst;
+	//uint8_t src, dst;
 }
 
 void prt(vm_t *vm) {
 	int offset = pop_dword(vm);
-	char *str = peek_ptr(vm, offset);
+	char *str = (char*)peek_ptr(vm, offset);
 	printf("%s", str);
 	vm->cpu->regs[PC]++;
 }
@@ -62,7 +62,7 @@ void prt(vm_t *vm) {
 void vm_reset(vm_t *vm) {
 	cpu_t *cpu = vm->cpu;
 
-	cpu->is_halt = false;
+	cpu->is_running = true;
 	memset(cpu->regs, 0, sizeof(cpu->regs[0])*REGS_COUNT);
 	memset(cpu->flags, 0, sizeof(cpu->flags[0])*SIZE_OF_FLAGS);
 }
@@ -70,7 +70,6 @@ void vm_reset(vm_t *vm) {
 void vm_setProgram(vm_t *vm, uint8_t *program, size_t size) {
 	vm->memory->ram = program;
 	vm->memory->size = size;
-	//vm->cpu->SP = size - 1;
 }
 
 cpu_t *vm_createCpu() {
@@ -112,11 +111,11 @@ int vm_run(vm_t *vm) {
 	uint8_t opcode = 0;
 	command cmd = NULL;
 
-	while (cpu->is_halt != true) {
+	while (cpu->is_running == true) {
 		//execute(vm, decode(fetch(vm), cmd_tab));
-		opcode = fetch(vm);
-		cmd = decode(opcode, cmd_tab);
-		execute(vm, cmd);
+		fetch(vm);
+		decode(vm, cmd_tab);
+		execute(vm);
 	}
 	return 0;
 }

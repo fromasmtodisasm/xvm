@@ -27,7 +27,7 @@ typedef enum FLAGS {
 typedef uint32_t uint;
 
 typedef struct vm_t vm_t;
-typedef bool (*command)(vm_t*);
+typedef void (*command)(vm_t*);
 
 enum regs {
 	AX,		/* accumulator */
@@ -44,7 +44,7 @@ enum regs {
 typedef struct cpu_t
 {
 	uint regs[REGS_COUNT];
-	bool is_halt;		/* */
+	bool is_running;		/* */
 	uint8_t oc;
 	command cmd;
 	uint flags[SIZE_OF_FLAGS];  /* */
@@ -65,9 +65,9 @@ typedef struct vm_t
 
 
 /* DEFINES */
-#define fetch(vm) (vm->memory->ram[vm->cpu->regs[PC]++]) 
-#define decode(oc, tab) (tab[oc])
-#define execute(vm, cmd) (cmd(vm))
+#define fetch(vm) (vm->cpu->oc = vm->memory->ram[vm->cpu->regs[PC]++]) 
+#define decode(vm, tab) (vm->cpu->cmd = tab[vm->cpu->oc])
+#define execute(vm) (vm->cpu->cmd(vm))
 
 #define fetch_dword(vm) (*((uint*)&(vm->memory->ram[(vm->cpu->regs[PC])++])))
 #define peek_dword(vm, ofst) (*((uint*)&(vm->memory->ram[ofst])))
@@ -75,8 +75,6 @@ typedef struct vm_t
 
 #define push_dword(vm, val) (*((uint*)&(vm->stack->ram[(vm->cpu->regs[SP]++)])) = val)
 #define pop_dword(vm) *((uint*)&(vm->stack->ram[--(vm->cpu->regs[SP])]))
-
-typedef bool (*command)(vm_t*);
 
 /* block of commands for processor */
 void nop(vm_t *vm);
