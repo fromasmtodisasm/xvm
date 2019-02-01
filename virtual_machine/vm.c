@@ -28,48 +28,47 @@ command cmd_tab[256] = {
 };
 
 void nop(vm_t *vm) {
-	vm->cpu->PC++;
-	printf("%s executed\n", __func__);
+	printf("%d:%s executed\n", vm->cpu->regs[PC], __func__);
 }
 
 void hlt(vm_t *vm) {
-	vm->cpu->flags[FSTOP] = true;
-	printf("%s executed\n", __func__);
+	printf("%d:%s executed\n", vm->cpu->regs[PC], __func__);
+	vm->cpu->is_halt = true;
 }
 
 void psh(vm_t *vm) {
-	uint value = *((uint*)&(vm->memory->ram[++(vm->cpu->PC)]));
-	*((uint*)&(vm->stack->ram[(vm->cpu->SP++)])) = value;
-	vm->cpu->PC += 4;
+	uint value = fetch_dword(vm);
+	push_dword(vm, value);
+	vm->cpu->regs[PC] += 3;
 }
 
 void pop(vm_t *vm) {
-	vm->cpu->AX = *((uint*)&(vm->stack->ram[--(vm->cpu->SP)]));
-	vm->cpu->PC++;
+	vm->cpu->regs[AX] = *((uint*)&(vm->stack->ram[--(vm->cpu->regs[SP])]));
+	vm->cpu->regs[PC]++;
+}
+
+void mov(vm_t *vm) {
+	cpu_t *cpu = vm->cpu;
+	uint8_t operands = ++cpu->regs[PC];
+	uint8_t src, dst;
 }
 
 void prt(vm_t *vm) {
-	//int offset = *((uint*)&(vm->memory->ram[++(vm->cpu->PC)]));
-	//char *str = (char*)&(vm->memory->ram[offset]);
-	//pop(vm);
-	int offset = *((uint*)&(vm->stack->ram[--(vm->cpu->SP)]));
-	char *str = *((uint*)&(vm->memory->ram[offset]));
+	int offset = pop_dword(vm);
+	char *str = ((char*)(&vm->memory->ram[offset]));
 	printf("%s", str);
-	vm->cpu->PC += 4;
+	vm->cpu->regs[PC]++;
 }
 
 void vm_reset(vm_t *vm) {
 	cpu_t *cpu = vm->cpu;
 
-	cpu->AX = 0;
-	cpu->PC = 0; 	
-	cpu->SP = 0;// vm->stack->size - 1;
-	cpu->SI = 0; 
-	cpu->DI = 0; 
+	cpu->is_halt = false;
+	memset(cpu->regs, 0, sizeof(cpu->regs[0])*REGS_COUNT);
 	memset(cpu->flags, 0, sizeof(cpu->flags[0])*SIZE_OF_FLAGS);
 }
 
-void vm_SetProgram(vm_t *vm, uint8_t *program, size_t size) {
+void vm_setProgram(vm_t *vm, uint8_t *program, size_t size) {
 	vm->memory->ram = program;
 	vm->memory->size = size;
 	//vm->cpu->SP = size - 1;
@@ -92,13 +91,13 @@ memory_t *vm_createMemory(uint8_t *ram, size_t size) {
 	return mem;
 }
 
-vm_t *vm_create(size_t stack_size) {
+vm_t *vm_create(memory_t * program, size_t stack_size) {
 	cpu_t *cpu = NULL;
 	memory_t *mem = NULL;
 	vm_t *vm = NULL;
 
 	if ((cpu = vm_createCpu()) != NULL) {
-		if ((mem = vm_createMemory(NULL, 0)) != NULL) {
+		if ((mem = vm_createMemory(program->ram, program->size)) != NULL) {
 			vm = malloc(sizeof(vm));
 			vm->cpu = cpu;
 			vm->memory = mem;
@@ -111,9 +110,15 @@ vm_t *vm_create(size_t stack_size) {
 int vm_run(vm_t *vm) {
 	cpu_t *cpu = vm->cpu;
 	memory_t *mem = vm->memory;
+	uint8_t opcode = 0;
+	command cmd = NULL;
 
-	while (cpu->flags[FSTOP] != true) {
-		cmd_tab[mem->ram[cpu->PC]](vm);
+	while (cpu->is_halt != true) {
+
+		//execute(vm, decode(fetch(vm), cmd_tab));
+		opcode = fetch(vm);
+		cmd = decode(opcode, cmd_tab);
+		execute(vm, cmd);
 	}
 	return 0;
 }

@@ -16,23 +16,38 @@
 */
 
 /* DEFINES */
+#define REGS_COUNT 8
 
 typedef enum FLAGS {
-	FSTOP,
 	FZ,
 	FC,
 	SIZE_OF_FLAGS
 }FLAGS;
 
+typedef uint32_t uint;
+
+typedef struct vm_t vm_t;
+typedef bool (*command)(vm_t*);
+
+enum regs {
+	AX,		/* accumulator */
+	BX,
+	CX,
+	DX,
+	SI,		/* source index */
+	DI,		/* destination index */
+	PC,		/* program counter */
+	SP		/* stack pointer */
+};
+
 /* definition of cpu */
 typedef struct cpu_t
 {
-	uint32_t AX;		/* accumulator */
-	uint32_t PC;		/* program counter */
-	uint32_t SP;		/* stack pointer */
-	uint32_t SI;		/* source index */
-	uint32_t DI;		/* destination index */
-	uint32_t flags[SIZE_OF_FLAGS];  /* */
+	uint regs[REGS_COUNT];
+	bool is_halt;		/* */
+	uint8_t oc;
+	command cmd;
+	uint flags[SIZE_OF_FLAGS];  /* */
 }cpu_t;
 
 typedef struct memory_t
@@ -48,9 +63,20 @@ typedef struct vm_t
 	memory_t *stack;
 }vm_t;
 
+
+/* DEFINES */
+#define fetch(vm) (vm->memory->ram[vm->cpu->regs[PC]++]) 
+#define decode(oc, tab) (tab[oc])
+#define execute(vm, cmd) (cmd(vm))
+
+#define fetch_dword(vm) (*((uint*)&(vm->memory->ram[(vm->cpu->regs[PC])++])))
+
+#define push_dword(vm, val) (*((uint*)&(vm->stack->ram[(vm->cpu->regs[SP]++)])) = val)
+#define pop_dword(vm) *((uint*)&(vm->stack->ram[--(vm->cpu->regs[SP])]))
+
 typedef bool (*command)(vm_t*);
 
-/* block of command of processor */
+/* block of commands for processor */
 void nop(vm_t *vm);
 
 void hlt(vm_t * vm);
@@ -63,12 +89,12 @@ void prt(vm_t * vm);
 
 void vm_reset(vm_t * cpu);
 
-void vm_SetProgram(vm_t * vm, uint8_t * program, size_t size);
+void vm_setProgram(vm_t * vm, uint8_t * program, size_t size);
 
 cpu_t * vm_createCpu();
 
 memory_t * vm_createMemory(uint8_t * ram, size_t size);
 
-vm_t * vm_create(size_t stack_siz);
+vm_t * vm_create(memory_t * program, size_t stack_size);
 
 int vm_run(vm_t * vm);
