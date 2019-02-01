@@ -70,6 +70,8 @@ typedef struct vm_t
 #define execute(vm, cmd) (cmd(vm))
 
 #define fetch_dword(vm) (*((uint*)&(vm->memory->ram[(vm->cpu->regs[PC])++])))
+#define peek_dword(vm, ofst) (*((uint*)&(vm->memory->ram[ofst])))
+#define peek_ptr(vm, ofst) (((uint*)&(vm->memory->ram[ofst])))
 
 #define push_dword(vm, val) (*((uint*)&(vm->stack->ram[(vm->cpu->regs[SP]++)])) = val)
 #define pop_dword(vm) *((uint*)&(vm->stack->ram[--(vm->cpu->regs[SP])]))

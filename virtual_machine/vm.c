@@ -43,8 +43,7 @@ void psh(vm_t *vm) {
 }
 
 void pop(vm_t *vm) {
-	vm->cpu->regs[AX] = *((uint*)&(vm->stack->ram[--(vm->cpu->regs[SP])]));
-	vm->cpu->regs[PC]++;
+	vm->cpu->regs[AX] = pop_dword(vm);
 }
 
 void mov(vm_t *vm) {
@@ -55,7 +54,7 @@ void mov(vm_t *vm) {
 
 void prt(vm_t *vm) {
 	int offset = pop_dword(vm);
-	char *str = ((char*)(&vm->memory->ram[offset]));
+	char *str = peek_ptr(vm, offset);
 	printf("%s", str);
 	vm->cpu->regs[PC]++;
 }
@@ -114,7 +113,6 @@ int vm_run(vm_t *vm) {
 	command cmd = NULL;
 
 	while (cpu->is_halt != true) {
-
 		//execute(vm, decode(fetch(vm), cmd_tab));
 		opcode = fetch(vm);
 		cmd = decode(opcode, cmd_tab);
