@@ -18,13 +18,13 @@
 /* DEFINES */
 #define REGS_COUNT 8
 
+typedef uint32_t uint;
+
 typedef enum FLAGS {
 	FZ,
 	FC,
 	SIZE_OF_FLAGS
 }FLAGS;
-
-typedef uint32_t uint;
 
 typedef struct vm_t vm_t;
 typedef void (*command)(vm_t*);
@@ -45,7 +45,7 @@ typedef struct cpu_t
 {
 	uint regs[REGS_COUNT];
 	bool is_running;		/* */
-	uint8_t oc;
+	uint8_t opcode;
 	command cmd;
 	uint flags[SIZE_OF_FLAGS];  /* */
 }cpu_t;
@@ -65,8 +65,8 @@ typedef struct vm_t
 
 
 /* DEFINES */
-#define fetch(vm) (vm->cpu->oc = vm->memory->ram[vm->cpu->regs[PC]++]) 
-#define decode(vm, tab) (vm->cpu->cmd = tab[vm->cpu->oc])
+#define fetch(vm) (vm->cpu->opcode = vm->memory->ram[vm->cpu->regs[PC]++]) 
+#define decode(vm, tab) (vm->cpu->cmd = tab[vm->cpu->opcode])
 #define execute(vm) (vm->cpu->cmd(vm))
 
 #define fetch_dword(vm) (*((uint*)&(vm->memory->ram[(vm->cpu->regs[PC])++])))
@@ -75,6 +75,8 @@ typedef struct vm_t
 
 #define push_dword(vm, val) (*((uint*)&(vm->stack->ram[(vm->cpu->regs[SP]++)])) = val)
 #define pop_dword(vm) *((uint*)&(vm->stack->ram[--(vm->cpu->regs[SP])]))
+
+void dump_cpu(vm_t * vm);
 
 /* block of commands for processor */
 void nop(vm_t *vm);
@@ -86,6 +88,8 @@ void psh(vm_t * vm);
 void pop(vm_t * vm);
 
 void prt(vm_t * vm);
+
+void jmp(vm_t * vm);
 
 void vm_reset(vm_t * cpu);
 

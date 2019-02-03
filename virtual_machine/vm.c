@@ -5,12 +5,15 @@
 #include <string.h> 
 #include <stdio.h>
 
+#define IS_BIT_SET(n,b) n >> b
+
 typedef uint32_t uint;
+
 
 command cmd_tab[256] = {
 	/*      0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, */
 	/*0x0*/ nop, nop, psh, pop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0x1*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
+	/*0x1*/ jmp, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
 	/*0x2*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
 	/*0x3*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
 	/*0x4*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
@@ -27,12 +30,28 @@ command cmd_tab[256] = {
 	/*0xf*/ prt, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, hlt,
 };
 
+void dump_cpu(vm_t *vm) {
+	int i = 0;
+	printf("Reg%d=0x%04x", i, vm->cpu->regs[i]);
+	for (i++; i < REGS_COUNT; i++) {
+		printf(" Reg%d=0x%04x", i, vm->cpu->regs[i]);
+	}
+	printf("\n");
+
+	i = 0;
+	printf("flag%d = [%1d]", i, vm->cpu->flags[i]);
+	for (i++; i < SIZE_OF_FLAGS; i++) {
+		printf("\nflag%d = [%1d]", i, vm->cpu->flags[i]);
+	}
+	printf("\n");
+}
+
 void nop(vm_t *vm) {
-	printf("%d:%s executed\n", vm->cpu->regs[PC], __func__);
+	printf("%04x: %s\n", vm->cpu->regs[PC] - 1, __func__);
 }
 
 void hlt(vm_t *vm) {
-	printf("%d:%s executed\n", vm->cpu->regs[PC], __func__);
+	printf("%04x: %s\n", vm->cpu->regs[PC] - 1, __func__);
 	vm->cpu->is_running = false;
 }
 
@@ -57,6 +76,10 @@ void prt(vm_t *vm) {
 	char *str = (char*)peek_ptr(vm, offset);
 	printf("%s", str);
 	vm->cpu->regs[PC]++;
+}
+
+void jmp(vm_t *vm) {
+	vm->cpu->regs[PC] = pop_dword(vm);
 }
 
 void vm_reset(vm_t *vm) {
