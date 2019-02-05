@@ -1,34 +1,11 @@
 #include "vm.h"
+//#include "fnc_proto.h"
 
 #include <stdlib.h> 
 #include <stdbool.h>
 #include <string.h> 
 #include <stdio.h>
 
-#define IS_BIT_SET(n,b) n >> b
-
-typedef uint32_t uint;
-
-
-command cmd_tab[256] = {
-	/*      0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, */
-	/*0x0*/ nop, nop, psh, pop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0x1*/ jmp, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0x2*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0x3*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0x4*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0x5*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0x6*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0x7*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0x8*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0x9*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0xa*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0xb*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0xc*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0xd*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0xe*/ nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop,
-	/*0xf*/ prt, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, nop, hlt,
-};
 
 void dump_cpu(vm_t *vm) {
 	int i = 0;
@@ -46,41 +23,7 @@ void dump_cpu(vm_t *vm) {
 	printf("\n");
 }
 
-void nop(vm_t *vm) {
-	printf("%04x: %s\n", vm->cpu->regs[PC] - 1, __func__);
-}
 
-void hlt(vm_t *vm) {
-	printf("%04x: %s\n", vm->cpu->regs[PC] - 1, __func__);
-	vm->cpu->is_running = false;
-}
-
-void psh(vm_t *vm) {
-	uint value = fetch_dword(vm);
-	push_dword(vm, value);
-	vm->cpu->regs[PC] += 3;
-}
-
-void pop(vm_t *vm) {
-	vm->cpu->regs[AX] = pop_dword(vm);
-}
-
-void mov(vm_t *vm) {
-	cpu_t *cpu = vm->cpu;
-	uint8_t operands = ++cpu->regs[PC];
-	//uint8_t src, dst;
-}
-
-void prt(vm_t *vm) {
-	int offset = pop_dword(vm);
-	char *str = (char*)peek_ptr(vm, offset);
-	printf("%s", str);
-	vm->cpu->regs[PC]++;
-}
-
-void jmp(vm_t *vm) {
-	vm->cpu->regs[PC] = pop_dword(vm);
-}
 
 void vm_reset(vm_t *vm) {
 	cpu_t *cpu = vm->cpu;
@@ -132,7 +75,7 @@ int vm_run(vm_t *vm) {
 	cpu_t *cpu = vm->cpu;
 	memory_t *mem = vm->memory;
 	uint8_t opcode = 0;
-	command cmd = NULL;
+	//command *cmd;// = NULL;
 
 	while (cpu->is_running == true) {
 		//execute(vm, decode(fetch(vm), cmd_tab));

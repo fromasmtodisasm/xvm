@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "table.h"
 
 /*
 #ifdef WIN32
@@ -21,13 +22,14 @@
 typedef uint32_t uint;
 
 typedef enum FLAGS {
-	FZ,
-	FC,
+	ZF,
+	CF,
+	SF,
 	SIZE_OF_FLAGS
 }FLAGS;
 
 typedef struct vm_t vm_t;
-typedef void (*command)(vm_t*);
+//typedef void (*command)(vm_t*);
 
 enum regs {
 	AX,		/* accumulator */
@@ -46,7 +48,7 @@ typedef struct cpu_t
 	uint regs[REGS_COUNT];
 	bool is_running;		/* */
 	uint8_t opcode;
-	command cmd;
+	command *cmd;
 	uint flags[SIZE_OF_FLAGS];  /* */
 }cpu_t;
 
@@ -65,9 +67,10 @@ typedef struct vm_t
 
 
 /* DEFINES */
+#define SET_PC(vm,val) vm->cpu->regs[PC] = val;
 #define fetch(vm) (vm->cpu->opcode = vm->memory->ram[vm->cpu->regs[PC]++]) 
-#define decode(vm, tab) (vm->cpu->cmd = tab[vm->cpu->opcode])
-#define execute(vm) (vm->cpu->cmd(vm))
+#define decode(vm, tab) (vm->cpu->cmd = &tab[vm->cpu->opcode])
+#define execute(vm) if (vm->cpu->cmd) ( vm->cpu->cmd->function(vm))
 
 #define fetch_dword(vm) (*((uint*)&(vm->memory->ram[(vm->cpu->regs[PC])++])))
 #define peek_dword(vm, ofst) (*((uint*)&(vm->memory->ram[ofst])))
@@ -79,17 +82,7 @@ typedef struct vm_t
 void dump_cpu(vm_t * vm);
 
 /* block of commands for processor */
-void nop(vm_t *vm);
-
-void hlt(vm_t * vm);
-
-void psh(vm_t * vm);
-
-void pop(vm_t * vm);
-
-void prt(vm_t * vm);
-
-void jmp(vm_t * vm);
+#include "commands.h"
 
 void vm_reset(vm_t * cpu);
 
