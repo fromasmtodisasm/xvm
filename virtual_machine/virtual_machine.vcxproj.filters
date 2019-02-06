@@ -29,10 +29,10 @@
     <ClInclude Include="vm.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="table.h">
+    <ClInclude Include="commands.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="commands.h">
+    <ClInclude Include="table.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

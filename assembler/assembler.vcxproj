@@ -24,13 +24,14 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>assembler</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <ProjectName>libassembler</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -90,11 +91,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/virtual_machine; $(xlang)/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)/virtual_machine; </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -148,10 +151,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\assembler2\main.c" />
+    <ClCompile Include="..\virtual_machine\commands.c" />
+    <ClCompile Include="..\virtual_machine\table.c" />
     <ClCompile Include="asm.c" />
+    <ClCompile Include="exp.c" />
+    <ClCompile Include="fileutils.c" />
+    <ClCompile Include="lexer.c" />
+    <ClCompile Include="preprocessor.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\assembler2\getopt.h" />
+    <ClInclude Include="..\virtual_machine\table.h" />
     <ClInclude Include="asm.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="debug.h" />
+    <ClInclude Include="error.h" />
+    <ClInclude Include="exp.h" />
+    <ClInclude Include="fileutils.h" />
+    <ClInclude Include="preprocessor.h" />
+    <ClInclude Include="lexer.h" />
+    <ClInclude Include="getopt.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="test_prog.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

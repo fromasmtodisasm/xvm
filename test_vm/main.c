@@ -1,10 +1,17 @@
 #include <vm.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
+
+#include <asm.h> 
+#include "fileutils.h"
 
 
 #define PROG_SIZE 128
 typedef uint32_t uint;
+
+
+
 
 uint8_t *make_program(size_t size) {
 
@@ -51,13 +58,36 @@ uint8_t *make_program(size_t size) {
 	return program;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
 	vm_t *vm;
 	int res = -1;
-	uint8_t *program = NULL;
 
-	if (program = make_program(PROG_SIZE)) {
-		memory_t *mem = vm_createMemory(program, PROG_SIZE);
+	Program *program = main_asm(argc, argv);
+	FILE *fp; 
+	fp = fopen("test_prog.txt", "r");
+	
+	perror(":");
+	char *prog = file2str(fp);
+	//Program *program = assembly(&prog);
+	
+	/*
+	fseek(fp, 0, SEEK_END);
+	int len = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	fread(program, 1, len, fp);
+	fclose(fp);
+	*/
+	
+
+//	Program *program = main_asm(argc, argv);
+
+	printf("disassembly\n");
+	printf("-----------\n");
+	//disassembly(program->mem, program->size, 1);
+	printf("-----------\n");
+	if (1) {
+	//if (program = make_program(PROG_SIZE)) {
+		memory_t *mem = vm_createMemory(program->mem, program->size);
 		vm = vm_create(mem, 128);
 		vm_reset(vm);
 		res = vm_run(vm);

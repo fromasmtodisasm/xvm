@@ -1,0 +1,13 @@
+//[label] [command] 
+jmp start
+
+start
+	call hello_world
+	hlt
+
+hello_world	
+	
+	push message
+	prt 
+	ret
+message "Hello, world!!!!!!"

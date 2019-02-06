@@ -67,7 +67,9 @@ typedef struct vm_t
 
 
 /* DEFINES */
-#define SET_PC(vm,val) vm->cpu->regs[PC] = val;
+#define SET_PC(vm,val) (vm->cpu->regs[PC] = val)
+#define GET_PC(vm) (vm->cpu->regs[PC])
+
 #define fetch(vm) (vm->cpu->opcode = vm->memory->ram[vm->cpu->regs[PC]++]) 
 #define decode(vm, tab) (vm->cpu->cmd = &tab[vm->cpu->opcode])
 #define execute(vm) if (vm->cpu->cmd) ( vm->cpu->cmd->function(vm))
@@ -76,8 +78,8 @@ typedef struct vm_t
 #define peek_dword(vm, ofst) (*((uint*)&(vm->memory->ram[ofst])))
 #define peek_ptr(vm, ofst) (((uint*)&(vm->memory->ram[ofst])))
 
-#define push_dword(vm, val) (*((uint*)&(vm->stack->ram[(vm->cpu->regs[SP]++)])) = val)
-#define pop_dword(vm) *((uint*)&(vm->stack->ram[--(vm->cpu->regs[SP])]))
+#define push_dword(vm, val) ((((uint*)(vm->stack->ram))[(vm->cpu->regs[SP]++)]) = val)
+#define pop_dword(vm) (((uint*)(vm->stack->ram))[--(vm->cpu->regs[SP])])
 
 void dump_cpu(vm_t * vm);
 

@@ -18,17 +18,13 @@
     <ClCompile Include="main.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="parser.c">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="commands.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="parser.h">
+    <Text Include="test_prog.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="getopt.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="intel_commands.c" />
   </ItemGroup>
 </Project>
