@@ -25,6 +25,11 @@ enum tokens {
 #define GET_TOKEN() (DEBUG_TRACE("Get from %s\n", __FUNCTION__), get_token())
 token_t *curr_token;
 
+void putDword(uint8_t *program, int *pc, int dword) {
+		*((uint32_t*)&(program[*pc])) = dword;
+		(*pc) += 4;
+}
+
 void skip_to(FILE *fp,int c) {
 	int ch;
 	while ((ch = getc(stdin)) != c && ch != EOF);
@@ -110,7 +115,7 @@ command *is_command(char *name) {
 
 	return bsearch(name, cmd_tab, TAB_SIZE, sizeof(command), compare);
 }
-uint32_t get_arg() {
+uint32_t get_arg(command *cmd) {
 
 	switch (get_token()->type)
 	{
@@ -127,7 +132,7 @@ uint32_t get_arg() {
 	}
 	break;
 	default:
-		fprintf(stderr, "Wrong argument!!!");
+		fprintf(stderr, "Wrong argument for %s command!!!", cmd->name);
 		exit(-1);
 		break;
 	}
@@ -140,9 +145,10 @@ void process_command(uint8_t *program, int *pc, command *cmd) {
 	program[(*pc)++] = cmd->opcode;
 	for (int i = 0; i < cmd->op_cnt; i++)
 	{
-		*((uint32_t*)&(program[(*pc)])) = get_arg();
+		*((uint32_t*)&(program[(*pc)])) = get_arg(cmd);
 		(*pc) += 4;
 	}
+	get_token();
 }
 
 /* mode: 0 - get, 1 - set*/
@@ -178,20 +184,39 @@ Label *process_label(int mode, int pc) {
 	}
 }
 
+void get_string(uint8_t *program, int *pc) {
+	int len = strlen(curr_token->text);
+
+	for (int i = 0; i < len; i++)
+	{
+		putDword(program, pc, curr_token->text[i]);
+	}
+	putDword(program, pc, 0);
+	get_token();
+
+}
+
 void get_data(uint8_t *program, int *pc) {
 	switch (curr_token->type)
 	{
 	case lcSTRING:
 	{
-		int len = strlen(curr_token->text);
-
-		for (int i = 0; i < len; i++)
+		get_string(program, pc);
+	}
+	break;
+	case lcNUMBER:
+	{
+		int number = atoi(curr_token->text);
+		putDword(program, pc, number);
+		while (get_token()->type == lcCOMMA)
 		{
-			*((uint32_t*)&(program[(*pc)])) = curr_token->text[i];
-			(*pc) += 4;
+			if (get_token()->type == lcNUMBER) {
+				putDword(program, pc, atoi(curr_token->text));
+			}
+			else {
+				fprintf(stderr, "syntax error, expected number but this token is %d\n", curr_token->type);
+			}
 		}
-		*((uint32_t*)&(program[*pc])) = 0;
-		(*pc) += 4;
 	}
 	break;
 	default:
@@ -237,7 +262,8 @@ Program *parse(char **buffer, int pass) {
 	uint32_t curr_arg;
 	int pc = 0;
 	if ((lexerInit(*buffer)) != 0) {
-		while ((GET_TOKEN(/*NEXT_TOKEN*/)), curr_token->type != lcEND) {
+		GET_TOKEN(/*NEXT_TOKEN*/);
+		while (curr_token->type != lcEND) {
 			//DEBUG_TRACE("PARSE EXTERNAL DEFINITION\n");
 			/**********************************************/
 			type = curr_token->type;
@@ -276,7 +302,7 @@ Program *parse(char **buffer, int pass) {
 	return &program;
 }
 
-Program *assembly(char ** src) {
+Program *assembly(char ** src, FILE * fout) {
 	debug_level = 0;
 
 	int pc = 0;
@@ -294,9 +320,9 @@ Program *assembly(char ** src) {
 		printf("0x%02x,\n", program->mem[i]);
 	}*/
 
-	FILE *aout = fopen("a.out", "wb+");
-	fwrite(program->mem, 1, program->size, aout);
-	fclose(aout);
+	//FILE *aout = fopen("a.out", "wb+");
+	fwrite(program->mem, 1, program->size, fout);
+	fclose(fout);
 	printf("};");
 	return program;
 

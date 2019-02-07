@@ -21,7 +21,9 @@
     <ClCompile Include="parser.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="commands.c" />
+    <ClCompile Include="gen_assembler.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="parser.h">
@@ -30,5 +32,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="intel_commands.c" />
+    <Text Include="commands.c" />
   </ItemGroup>
 </Project>

@@ -140,9 +140,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="commands.c">
+    <Text Include="commands.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+      <FileType>CppCode</FileType>
+    </Text>
     <ClCompile Include="gen_assembler.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="parser.c" />

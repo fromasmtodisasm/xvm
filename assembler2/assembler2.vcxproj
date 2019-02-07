@@ -94,6 +94,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /y $(ProjectDir)a.out $(SolutionDir)test_vm\a.out</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>$(OutputPath)utils $(SolutionDir)utils/commands.c</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -150,10 +156,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="test_prog.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="getopt.h" />
+    <None Include="test_prog.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

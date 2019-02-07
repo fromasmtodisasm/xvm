@@ -16,6 +16,7 @@
 
 #include "common.h"
 #include "fileutils.h"
+#include "preprocessor.h"
 //#include "preprocessor.h"
 #include "debug.h"
 
@@ -44,7 +45,7 @@ struct command
 struct globalArgs_t {
 	int noIndex;                /* parametr -I */
 	const char *debugFileName;  /* parametr -d */
-	FILE *outFile;
+	char *outFile;				/* parametr -o */
 	int verbosity;              /* parametr -v */
 	char **inputFiles;          /* input files */
 	int numInputFiles;          /* number input files  */
@@ -96,8 +97,11 @@ int process_args(int argc, char **argv) {
 		while (opt != -1) {
 			empty_cmd = FALSE;
 			switch (opt) {
-			case 'o':
+			case 'd':
 				globalArgs.debugFileName = optarg;
+				break;
+			case 'o':
+				globalArgs.outFile = optarg;
 				break;
 			case 'v':
 			{
@@ -184,7 +188,7 @@ Program *main_asm(int argc, char **argv) {
 
 	debug_file = stderr;
 	globalArgs.debugFileName = "out.log";
-	globalArgs.outFile = stdout;
+	//globalArgs.outFile = stdout;
 	globalArgs.verbosity = 0;
 	globalArgs.inputFiles = NULL;
 	globalArgs.numInputFiles = 0;
@@ -206,7 +210,8 @@ Program *main_asm(int argc, char **argv) {
 				for (; cur_file < globalArgs.numInputFiles; cur_file++) {
 					//DEBUG_PROD("Load %s \n", globalArgs.inputFiles[cur_file]]);
 					if (source = loadProgram(globalArgs.inputFiles[cur_file])) {
-						return assembly(&source);
+						FILE *fout = fopen(globalArgs.outFile, "wb+");
+						return assembly(&source, fout);
 						DEBUG_PROD("\nParsed!!!\n");
 						//interprete(syntax_tree);
 					}
@@ -236,5 +241,11 @@ Program *main_asm(int argc, char **argv) {
 	}
 	else  usage(basename(argv[0]));
 	fclose(debug_file);
+	return 0;
+}
+
+int main(int argc, char *argv[]) {
+
+	main_asm(argc, argv);
 	return 0;
 }

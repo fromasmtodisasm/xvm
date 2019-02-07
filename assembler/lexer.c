@@ -38,7 +38,7 @@ struct commands {
 	"read",     lcREAD,     "break",      lcBREAK,      "goto",     lcGOTO,
 	"continue", lcCONTINUE, "begin",      lcBEGINBLOCK, "function", lcFUNCTION,
 	"void",     lcVOID,     "interprete", lcINTERPRETE, "sleep",    lcSLEEP,
-	"end",      lcENDBLOCK, "var",         lcVAR,
+	"var",         lcVAR,
 	"pause",    lcPAUSE,    "",        lcEND
 };
 
@@ -362,6 +362,10 @@ token_t *get_token() {
 			else {
 				type = lcMUL;
 			}
+			break;
+		}
+		case ',': {
+			type = lcCOMMA;
 			break;
 		}
 		case '/': {

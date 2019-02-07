@@ -4,9 +4,10 @@
 ADD(st left, st right) : 0 #{
 	uint res = 0;
 	push_dword(vm, left + right);
-
 }#
-AND:0
+AND(st left, st right) : 0 #{
+	uint res = left & right;
+}#
 CALL(cmd proc) : 0 #{
 
 	uint next_instr = GET_PC(vm) + 3;
@@ -32,20 +33,22 @@ CMP(st left, st right):0 #{
 	}
 
 }#
-DEC:0
+DEC(cmd_inderect arg):3 #{
+	*arg = *arg - 1;
+}#
 DIV:0
 HLT:0 #{
-	
 	vm->cpu->is_running = false;
 }#
 IDIV:0
 IMUL:0
-INC:0
+INC(cmd_inderect arg):3 #{
+	*arg = *arg + 1;
+}#
+
 INT:0
 INTO:0
 JA(st left, st right, st address):0 #{
-
-	if (address <= vm->memory->size - vm->cpu->regs[PC])
 	if (left > right)
 		vm->cpu->regs[PC] += address;
 }#
@@ -53,13 +56,26 @@ JMP(cmd address):0 #{
 	//if (address <= vm->memory->size - vm->cpu->regs[PC])
 		vm->cpu->regs[PC] = address;
 }#
-JZ:0
+JZ(st left, st right, st address):0 #{
+	if (left == right)
+		SET_PC(vm,address);
+}#
+JNZ(st left, st right, st address):0 #{
+	if (left != right)
+		SET_PC(vm,address);
+}#
+JC(cmd address):0 #{
+	if (vm->cpu->flags[CF])
+		SET_PC(vm,address);
+}#
 LEA:0
 LOOP:0
 LOOPE:0
 LOOPNE:0
-LOAD(cmd addr) : 4 #{
-//
+LOAD(cmd addr) : 3 #{
+	
+	uint val = peek_dword(vm, addr);
+	push_dword(vm, val);
 }#
 MUL:0
 NEG:0
@@ -71,10 +87,7 @@ OR:0
 POP(st val):0 #{
 	vm->cpu->regs[AX] = val;
 }#
-PRT(st offset):0 #{
-	char *str = (char*)peek_ptr(vm, offset);
-	uint32_t dword;
-	int i = 0;
+PRT(inderect str):0 #{
 	while (*str != 0)
 	{
 		printf("%c", *str);
@@ -95,7 +108,22 @@ SAL:0
 SAR:0
 SHL:0
 SHR:0
-SUB:0
+SUB(st left, st right) : 0 #{
+	uint res = 0;
+	push_dword(vm, left - right);
+	if (left < right)
+		vm->cpu->flags[CF] = 1;
+	else 
+		vm->cpu->flags[CF] = 0;
+
+}#
 TEST:0
 XCHG:0
 XOR:0
+
+DUP(st_peek duplicate) : 0 #{
+	push_dword(vm, duplicate);
+}#
+OVER(st_over over) : 0 #{
+	push_dword(vm, over);
+}#

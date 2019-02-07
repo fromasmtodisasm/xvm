@@ -13,7 +13,7 @@ typedef struct Program {
 }Program;
 void disassembly(uint8_t * memory, size_t size, int mode);
 
-Program* assembly(char ** src);
+Program* assembly(char ** src, FILE * fout);
 
 
 Program *main_asm(int argc, char ** argv);

@@ -20,11 +20,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="test_prog.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="getopt.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
+    <None Include="test_prog.asm" />
   </ItemGroup>
 </Project>

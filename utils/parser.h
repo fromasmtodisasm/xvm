@@ -10,6 +10,11 @@ typedef enum
 
 typedef enum {
 	opSTACK,
+	opSTACK_PEEK,
+	opSTACK_OVER,
+	opINDERECT,
+	opINDERECT_CMD,
+	opSTREF,
 	opMEMORY,
 	opWRONG
 }operand_type;

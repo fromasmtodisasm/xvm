@@ -1,5 +1,4 @@
 #include "vm.h"
-//#include "fnc_proto.h"
 
 #include <stdlib.h> 
 #include <stdbool.h>
@@ -39,7 +38,7 @@ void vm_setProgram(vm_t *vm, uint8_t *program, size_t size) {
 }
 
 cpu_t *vm_createCpu() {
-	cpu_t *cpu = malloc(sizeof(cpu));
+	cpu_t *cpu = malloc(sizeof(cpu_t));
 	return cpu;
 }
 
@@ -78,6 +77,7 @@ int vm_run(vm_t *vm) {
 	//command *cmd;// = NULL;
 
 	while (cpu->is_running == true) {
+
 		//execute(vm, decode(fetch(vm), cmd_tab));
 		fetch(vm);
 		decode(vm, cmd_tab);

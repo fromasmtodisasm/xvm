@@ -43,6 +43,41 @@ void make_enum(gen_command commands[], size_t cnt, FILE *fout) {
 	fprintf(fout,"}OPCODES;\n");
 }
 
+void gen_get_operands(gen_command *command, int op_number, FILE *def) {
+
+	switch (command->ops[op_number].type)
+		{
+		case opMEMORY:
+			fprintf(def, "\tuint %s = fetch_dword(vm);\n", command->ops[op_number].name);
+			break;
+		case opSTACK:
+			fprintf(def, "\tuint %s = pop_dword(vm);\n", command->ops[op_number].name);
+			break;
+		case opSTACK_PEEK:
+			fprintf(def, "\tuint %s = peek_stack_dword(vm, 0);\n", command->ops[op_number].name);
+			break;
+		case opSTACK_OVER:
+			fprintf(def, "\tuint %s = peek_stack_dword(vm, -1);\n", command->ops[op_number].name);
+			break;
+		case opINDERECT:
+			fprintf(def, 
+				"\tuint offset = pop_dword(vm);\n" 
+				"\tchar *%s = (char*)peek_ptr(vm, offset);",
+				command->ops[op_number].name);
+			break;
+		case opINDERECT_CMD:
+			fprintf(def, 
+				"\tuint offset = fetch_dword(vm);\n" 
+				"\tchar *%s = (char*)peek_ptr(vm, offset);",
+				command->ops[op_number].name);
+			break;
+		case opSTREF:
+			fprintf(def, "\tuint *%s = peek_stack_ref(vm, 0);\n", command->ops[op_number].name);
+			break;
+		default:
+			break;
+		}
+}
 void make_func(gen_command commands[], size_t cnt, FILE * proto, FILE* def) {
 
 	char inc_pc[256];
@@ -72,22 +107,13 @@ void make_func(gen_command commands[], size_t cnt, FILE * proto, FILE* def) {
 		fprintf(proto, "_command(vm_t *vm);\n");
 		fprintf(def,
 			"_command(vm_t *vm) {\n"); 
+		fprintf(def, "\n\tLOG_FUNC(vm);\n");
 		for (int j = commands[i].op_cnt - 1; j >= 0 ; j--) {
-			switch (commands[i].ops[j].type)
-			{
-			case opMEMORY:
-				fprintf(def, "\tuint %s = fetch_dword(vm);\n", commands[i].ops[j].name);
-				break;
-			case opSTACK:
-				fprintf(def, "\tuint %s = pop_dword(vm);\n", commands[i].ops[j].name);
-				break;
-			default:
-				break;
-			}
+			gen_get_operands(&commands[i], j, def);
 		}
 
 		
-		fprintf(def, "\n\tLOG_FUNC(vm);\n\t%s%s}\n",
+		fprintf(def, "\n\t%s%s}\n",
 			commands[i].func_body ? commands[i].func_body : inc_pc,
 			commands[i].func_body ? inc_pc : ""
 		);
@@ -241,6 +267,26 @@ operand_type get_optype(char *type, char *name) {
 		printf("Operand %s in stack\n", name);
 		return  opSTACK;
 	}
+	if (!strcmp(type, "st_peek")) {
+		printf("Operand %s peeked from stack\n", name);
+		return  opSTACK_PEEK;
+	}
+	if (!strcmp(type, "st_over")) {
+		printf("Operand %s peeked uner stack\n", name);
+		return  opSTACK_OVER;
+	}
+	if (!strcmp(type, "inderect")) {
+		printf("Operand %s peeked uner stack\n", name);
+		return  opINDERECT;
+	}
+	if (!strcmp(type, "cmd_inderect")) {
+		printf("Operand %s peeked uner stack\n", name);
+		return  opINDERECT_CMD;
+	}
+	if (!strcmp(type, "st_ref")) {
+		printf("Operand %s peek  stack reference\n", name);
+		return  opSTREF;
+	}
 	else if (!strcmp(type, "cmd")) {
 		printf("Operand %s in command\n", name);
 		return opMEMORY;
@@ -260,7 +306,7 @@ int get_operands(FILE *fp, gen_command *cmds) {
 	case 2:
 		cmds->ops[0].type = get_optype(type, name);
 		cmds->ops[0].name = strdup(name);
-		if (cmds->ops[0].type == opMEMORY) {
+		if (cmds->ops[0].type == opMEMORY || cmds->ops[0].type == opINDERECT_CMD) {
 			cmds->in_cmd_ops++;
 		}
 		cmds->op_cnt++;
@@ -275,9 +321,11 @@ int get_operands(FILE *fp, gen_command *cmds) {
 			cmds->ops[i].name = strdup(name);
 			if (cmds->ops[i].type == opWRONG)
 				return 0;
-			if (cmds->ops[i].type == opMEMORY) {
+			
+			if (cmds->ops[0].type == opMEMORY || cmds->ops[0].type == opINDERECT_CMD) {
 				cmds->in_cmd_ops++;
 			}
+
 			cmds->op_cnt++;
 		}
 		else return 0;

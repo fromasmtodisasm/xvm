@@ -80,6 +80,8 @@ typedef struct vm_t
 
 #define push_dword(vm, val) ((((uint*)(vm->stack->ram))[(vm->cpu->regs[SP]++)]) = val)
 #define pop_dword(vm) (((uint*)(vm->stack->ram))[--(vm->cpu->regs[SP])])
+#define peek_stack_dword(vm,n) (((uint*)(vm->stack->ram))[(vm->cpu->regs[SP]) + n])
+#define peek_stack_ref(vm,n) &(((uint*)(vm->stack->ram))[(vm->cpu->regs[SP]) + n])
 
 void dump_cpu(vm_t * vm);
 
