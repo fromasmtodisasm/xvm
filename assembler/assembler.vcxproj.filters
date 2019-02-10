@@ -18,12 +18,6 @@
     <ClCompile Include="asm.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="..\virtual_machine\table.c">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="..\virtual_machine\commands.c">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="lexer.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -39,9 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="asm.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="..\virtual_machine\table.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="lexer.h">

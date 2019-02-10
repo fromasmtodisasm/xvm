@@ -16,10 +16,11 @@ hello_world
 
 test_loop
 	load loop_cnt
-	push 5
+	load end_loop_cnt
 	push end_loop
 	jz
 	push message 
+	SUPERPUPERCOMMAND
 	prt 
 	inc loop_cnt
 	jmp test_loop
@@ -29,3 +30,4 @@ end_loop
 label_test "This is test label string with number 12345"
 message "Hello world!"
 loop_cnt 0 
+end_loop_cnt 5

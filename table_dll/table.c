@@ -1,7 +1,7 @@
 #include "table.h"
-#include "vm.h"
+#include "commands.h"
 
-command cmd_tab[0x2c] = {
+command cmd_tab[0x2d] = {
 	/*0x00*/	{"add", ADD, 0, add_command },
 	/*0x01*/	{"and", AND, 0, and_command },
 	/*0x02*/	{"call", CALL, 1, call_command },
@@ -43,7 +43,8 @@ command cmd_tab[0x2c] = {
 	/*0x26*/	{"shl", SHL, 0, shl_command },
 	/*0x27*/	{"shr", SHR, 0, shr_command },
 	/*0x28*/	{"sub", SUB, 0, sub_command },
-	/*0x29*/	{"test", TEST, 0, test_command },
-	/*0x2a*/	{"xchg", XCHG, 0, xchg_command },
-	/*0x2b*/	{"xor", XOR, 0, xor_command },
+	/*0x29*/	{"superpupercommand", SUPERPUPERCOMMAND, 0, superpupercommand_command },
+	/*0x2a*/	{"test", TEST, 0, test_command },
+	/*0x2b*/	{"xchg", XCHG, 0, xchg_command },
+	/*0x2c*/	{"xor", XOR, 0, xor_command },
 };

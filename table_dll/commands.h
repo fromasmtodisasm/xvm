@@ -40,6 +40,7 @@ void sar_command(vm_t *vm);
 void shl_command(vm_t *vm);
 void shr_command(vm_t *vm);
 void sub_command(vm_t *vm);
+void superpupercommand_command(vm_t *vm);
 void test_command(vm_t *vm);
 void xchg_command(vm_t *vm);
 void xor_command(vm_t *vm);

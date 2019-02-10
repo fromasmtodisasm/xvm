@@ -324,6 +324,15 @@ void sub_command(vm_t *vm) {
 		vm->cpu->flags[CF] = 0;
 
 }}
+void superpupercommand_command(vm_t *vm) {
+
+	LOG_FUNC(vm);
+
+	{
+
+	//
+		
+}}
 void test_command(vm_t *vm) {
 
 	LOG_FUNC(vm);

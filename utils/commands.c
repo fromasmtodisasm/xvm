@@ -133,3 +133,9 @@ DUP(st_peek duplicate) : 0 #{
 OVER(st_over over) : 0 #{
 	push_dword(vm, over);
 }#
+
+SUPERPUPERCOMMAND():0 #{
+
+	//
+		
+}#

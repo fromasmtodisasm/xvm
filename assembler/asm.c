@@ -1,13 +1,15 @@
 #include "asm.h"
-#include "table.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "lexer.h"
 #define LABEL_SIZE 256
 Label label[LABEL_SIZE];
 #include "debug.h"
+
+#include <Windows.h>
 
 
 
@@ -18,12 +20,33 @@ enum tokens {
 	tokLabel,
 	tokOpcode
 }tokens;
+
+typedef command *(*GetTable)();
+typedef int(*GetSize)();
+
+static GetTable get_table;
+static GetSize get_size;
+
 /***************************************************************************/
 /***************** Defines used by this module only ************************/
 /***************************************************************************/
 #define exptected_func(...) DEBUG_TRACE("On line %d for source line = %d\n", __LINE__, get_line());_expected_func( __VA_ARGS__)
 #define GET_TOKEN() (DEBUG_TRACE("Get from %s\n", __FUNCTION__), get_token())
+command *cmd_tab;
+int TAB_SIZE;
+
 token_t *curr_token;
+
+int load_table(char *name) {
+	HMODULE table_lib = LoadLibrary(name);
+	if (!table_lib) return 0;
+	get_table = (GetTable)GetProcAddress(table_lib, "get_table");
+	get_size = (GetSize)GetProcAddress(table_lib, "get_size");
+	if (!get_table || !get_size) {
+		return 0;
+	}
+	return 1;
+}
 
 void putDword(uint8_t *program, int *pc, int dword) {
 		*((uint32_t*)&(program[*pc])) = dword;
@@ -72,43 +95,6 @@ int compare(const void * x1, const void * x2)   // функция сравнения элементов м
 	char *key = (char*)x1;
 	cmd2 = (command*)x2;
 	return strcmp(key, cmd2->name);              // если результат вычитания равен 0, то числа равны, < 0: x1 < x2; > 0: x1 > x2
-}
-
-
-
-
-int assembly_line(FILE *line, int pc, uint8_t *mem, int pass) {
-	char buffer[100];
-	char label[32] = { 0 };
-	char *cmd;
-	int offset = 0;
-	int status = 0;
-	if (!fgets(buffer, sizeof(buffer) - 1, line)) return;
-	cmd = get_cmd(buffer);
-	command *_cmd = NULL;
-	if (cmd)
-		 _cmd = bsearch(cmd, cmd_tab, TAB_SIZE, sizeof(command), compare);
-
-	if (!_cmd && pass == 1) {
-		printf("%s: this is label\n", cmd);
-		cmd = get_cmd(buffer);
-		command *_cmd = NULL;
-		if (cmd)
-			 _cmd = bsearch(cmd, cmd_tab, TAB_SIZE, sizeof(command), compare);
-		if (_cmd) {
-			printf("%s: this is command with opcode = %d and have %d operands\n", cmd, _cmd->opcode, _cmd->op_cnt);
-		}
-
-	}
-	else {
-		if (pass == 2 || pass == 1) {
-			printf("%s: this is command with opcode = %d and have %d operands\n", cmd, _cmd->opcode, _cmd->op_cnt);
-		}
-	}
-	
-
-	return offset;
-
 }
 
 command *is_command(char *name) {
@@ -309,8 +295,14 @@ Program *assembly(char ** src, FILE * fout) {
 	uint8_t mem[1024];
 	
 	SET_DEBUG_LVL(DEBUG_PROD);
+
+	load_table("table_dll.dll");
+	cmd_tab = get_table();
+	TAB_SIZE = get_size();
 	parse(src, 1);
+
 	SET_DEBUG_LVL(DEBUG_PROD);
+
 	Program *program = parse(src, 2);
 
 	printf("uint8_t *my_program[] = {\n");

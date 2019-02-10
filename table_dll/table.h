@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#define TAB_SIZE 44
+#define TAB_SIZE 45
 typedef enum OPCODES {
 	ADD = 0x00,
 	AND = 0x01,
@@ -43,9 +43,10 @@ typedef enum OPCODES {
 	SHL = 0x26,
 	SHR = 0x27,
 	SUB = 0x28,
-	TEST = 0x29,
-	XCHG = 0x2a,
-	XOR = 0x2b,
+	SUPERPUPERCOMMAND = 0x29,
+	TEST = 0x2a,
+	XCHG = 0x2b,
+	XOR = 0x2c,
 }OPCODES;
 typedef struct vm_t vm_t;
 typedef struct command{
@@ -54,5 +55,5 @@ typedef struct command{
 	int op_cnt;
 	void(*function) (vm_t*);
 }command;
-extern command cmd_tab[0x2c];
+extern command cmd_tab[0x2d];
 

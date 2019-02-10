@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "table.h"
 
 /*
 #ifdef WIN32
@@ -18,8 +17,17 @@
 
 /* DEFINES */
 #define REGS_COUNT 8
-
 typedef uint32_t uint;
+
+typedef struct vm_t vm_t;
+#define COMMAND_DEFINED
+
+typedef struct command {
+	char *name;
+	int opcode;
+	int op_cnt;
+	void(*function) (vm_t*);
+}command;
 
 typedef enum FLAGS {
 	ZF,
@@ -84,10 +92,13 @@ typedef struct vm_t
 #define peek_stack_dword(vm,n) (((uint*)(vm->stack->ram))[(vm->cpu->regs[SP]) + n])
 #define peek_stack_ref(vm,n) &(((uint*)(vm->stack->ram))[(vm->cpu->regs[SP]) + n])
 
+void print_commands();
+
 void dump_cpu(vm_t * vm);
 
 /* block of commands for processor */
-#include "commands.h"
+
+int vm_init(char * table_name);
 
 void vm_reset(vm_t * cpu);
 
@@ -100,3 +111,8 @@ memory_t * vm_createMemory(uint8_t * ram, size_t size);
 vm_t * vm_create(memory_t * program, size_t stack_size);
 
 int vm_run(vm_t * vm);
+
+
+
+extern command *cmd_tab;
+extern int TAB_SIZE;

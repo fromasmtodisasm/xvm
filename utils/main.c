@@ -6,7 +6,7 @@
 
 #include "parser.h"
 
-char *proj_dir = "../virtual_machine/";
+char *proj_dir = "";// "../virtual_machine/";
 char out_path[256];
 
 
@@ -148,7 +148,7 @@ void make_command(gen_command commands[], size_t cnt, file_map *fm) {
 	make_func(commands, cnt, fnc_proto, fnc_def);
 
 	fprintf(table_c, "#include \"table.h\"\n");
-	fprintf(table_c, "#include \"vm.h\"\n");
+	fprintf(table_c, "#include \"commands.h\"\n");
 	//fprintf(table_c, "#include \"fnc_proto.h\"\n");
 	fprintf(table_c, "\ncommand cmd_tab[TAB_SIZE] = {\n", cnt);
 
@@ -332,6 +332,7 @@ int main(int argc, char *argv[]) {
 
 	char *fout = "table.h";
 	char *fin = argv[1];// "commands.txt";
+	if (argc == 3) proj_dir = argv[2];
 	FILE *old_stdin = freopen(fin, "r+", stdin);
 
 	init(fm, 4);
