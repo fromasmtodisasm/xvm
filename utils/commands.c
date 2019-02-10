@@ -77,6 +77,12 @@ LOAD(cmd addr) : 3 #{
 	uint val = peek_dword(vm, addr);
 	push_dword(vm, val);
 }#
+SAVE(cmd addr) : 3 #{
+	
+	uint val = peek_dword(vm, addr);
+	*get_ref(vm, addr) = val;
+}#
+
 MUL:0
 NEG:0
 NOP():0 #{
