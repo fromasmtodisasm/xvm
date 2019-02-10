@@ -98,7 +98,7 @@
       <Command>copy /y $(ProjectDir)a.out $(SolutionDir)test_vm\a.out</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>$(OutputPath)utils $(SolutionDir)utils/commands.c</Command>
+      <Command>$(OutputPath)utils $(SolutionDir)utils/commands.c $(SolutionDir)table_dll</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

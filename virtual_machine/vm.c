@@ -5,6 +5,37 @@
 #include <string.h> 
 #include <stdio.h>
 
+#define WIN32_LEAN_AND_MEAN  
+#include <Windows.h>
+
+typedef command *(*GetTable)();
+typedef int(*GetSize)();
+
+static GetTable get_table;
+static GetSize get_size;
+
+command *cmd_tab;
+int TAB_SIZE;
+
+void print_commands() {
+	for (int i = 0; i < TAB_SIZE; i++)
+		printf(
+			"command %s with opcode %d and %d arguments\n", 
+			cmd_tab[i].name,
+			cmd_tab[i].opcode,
+			cmd_tab[i].op_cnt
+		);
+}
+int load_table(char *name) {
+	HMODULE table_lib = LoadLibrary(name);
+	if (!table_lib) return FALSE;
+	get_table = (GetTable)GetProcAddress(table_lib, "get_table");
+	get_size = (GetSize)GetProcAddress(table_lib, "get_size");
+	if (!get_table || !get_size) {
+		return FALSE;
+	}
+	return TRUE;
+}
 
 void dump_cpu(vm_t *vm) {
 	int i = 0;
@@ -23,6 +54,16 @@ void dump_cpu(vm_t *vm) {
 }
 
 
+int vm_init(char *table_name) {
+	if (load_table(table_name)) {
+		cmd_tab = get_table();
+		TAB_SIZE = get_size();
+	}
+	else {
+		return FALSE;
+	}
+	return TRUE;
+}
 
 void vm_reset(vm_t *vm) {
 	cpu_t *cpu = vm->cpu;

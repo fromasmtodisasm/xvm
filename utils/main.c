@@ -6,7 +6,7 @@
 
 #include "parser.h"
 
-char *proj_dir = "../virtual_machine/";
+char *proj_dir = "";// "../virtual_machine/";
 char out_path[256];
 
 
@@ -148,7 +148,7 @@ void make_command(gen_command commands[], size_t cnt, file_map *fm) {
 	make_func(commands, cnt, fnc_proto, fnc_def);
 
 	fprintf(table_c, "#include \"table.h\"\n");
-	fprintf(table_c, "#include \"vm.h\"\n");
+	fprintf(table_c, "#include \"commands.h\"\n");
 	//fprintf(table_c, "#include \"fnc_proto.h\"\n");
 	fprintf(table_c, "\ncommand cmd_tab[0x%02x] = {\n", cnt);
 
@@ -190,76 +190,6 @@ int init(file_map *fm, int cnt) {
 		out_path[len] = 0;
 		fm[i].fp = fopen(out_path, "w+");
 	}
-}
-
-int test_main(int argc, char *argv[]) {
-
-	size_t tw = 0x10; /* tab width */
-	size_t th = 0x10; /* tab height */
-	if (argc < 2) return -1;
-
-	char *fout = "table.h";
-	char *fin = argv[1];// "commands.txt";
-	FILE *old_stdin = freopen(fin, "r+", stdin);
-
-	init(fm, 4);
-
-	size_t command_cnt = 0x100;
-	gen_command commands[0x100];
-
-	char *buffer = malloc(2048);
-	*buffer = 0;
-	char cmd[16];
-	
-	int line_cnt = 0;
-	printf("Start of parse...\n");
-	int ch = 0;
-
-	int fp;
-	int test = 0;
-	int op_size = 0; // size of operands of command
-	int bbs = 0; // before buffer size
-	for (int i = 0; 
-		fp = ftell(stdin), (test = scanf("\t%[A-z]:%d%n%[^\n]", cmd, &op_size, &bbs, buffer)) != EOF; 
-		i++) 
-	{
-		char *sharp; int offset, len = 0;
-			//while (ch = getchar(), isspace(ch) && ch != EOF);
-		if (test == 0) {
-			;
-		}
-		switch (test)
-		{
-		case 1: //Only cmd is present
-		case 2:
-
-			commands[line_cnt].func_body = 0;
-			break;
-		case 3:
-
-			//commands[line_cnt].func_body = 0;
-			get_func_body(commands, buffer, line_cnt, bbs, fp);
-			break;
-		case 4:
-			get_func_body(commands, buffer, line_cnt, bbs, fp);
-			break;
-		default:
-			fprintf(stderr, "Imposible!!!\n");
-			skip_to('\n');
-			break;
-		}
-		
-
-		commands[line_cnt].name = strdup(cmd);
-		commands[line_cnt].op_size = op_size;
-		line_cnt++;
-		skip_to('\n');
-	}
-
-	printf("Begin generating...\n");
-	make_command(commands, line_cnt, fm);
-	
-
 }
 
 operand_type get_optype(char *type, char *name) {
@@ -402,6 +332,7 @@ int main(int argc, char *argv[]) {
 
 	char *fout = "table.h";
 	char *fin = argv[1];// "commands.txt";
+	if (argc == 3) proj_dir = argv[2];
 	FILE *old_stdin = freopen(fin, "r+", stdin);
 
 	init(fm, 4);

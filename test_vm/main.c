@@ -7,9 +7,13 @@
 #include <asm.h> 
 #include "fileutils.h"
 
-
 #define PROG_SIZE 128
 typedef uint32_t uint;
+
+command *cmd_tab;
+int TAB_SIZE;
+
+
 
 void print_args(uint8_t *memory, command *cmd) {
 	int i = 0;
@@ -22,7 +26,7 @@ void print_args(uint8_t *memory, command *cmd) {
 /* mode: 1 - text mode, 0 - raw numbers */
 void disassembly(uint8_t *memory, size_t size, int mode) {
 	command *cmd = NULL;
-	for (int i = 0; i < size; ) {
+	for (size_t i = 0; i < size; ) {
 		uint8_t byte = *((uint8_t*)&(memory[(i)]));
 
 		// print current addres of command
@@ -37,15 +41,7 @@ void disassembly(uint8_t *memory, size_t size, int mode) {
 			if (cmd->op_cnt == 0) printf("%9.8s", " ");
 			printf("|");
 			printf("\t%s ", cmd->name);
-			if (cmd->opcode == PRT){
-				//in memory[i] - index in memory
-//				int index = *((uint32_t*)&(memory[i]));
-//				for (int i = 0; memory[index] != 0; index += 4)
-//					printf("%c", memory[index]);
-
-			}
-			else 
-				print_args(&memory[i],cmd);
+			print_args(&memory[i],cmd);
 			puts("");
 
 			i += cmd->op_cnt * 4;
@@ -59,6 +55,7 @@ void disassembly(uint8_t *memory, size_t size, int mode) {
 
 	}
 }
+
 Program *load_program(char *name) {
 
 	FILE *fp; 
@@ -79,6 +76,11 @@ int main(int argc, char *argv[]) {
 	vm_t *vm;
 	int res = -1;
 
+	if (!vm_init("table_dll.dll")) {
+		fprintf(stderr, "Fail load table_dll\n");
+		return res;
+	}
+	print_commands();
 	Program *program = load_program("a.out");
 	if (!program) return res;
 

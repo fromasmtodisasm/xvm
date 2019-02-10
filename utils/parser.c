@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <ctype.h>
+#include <string.h>
 #include "parser.h"
 
 
@@ -14,7 +16,7 @@ char *get_cmd(FILE *fp) {
 	}
 	ungetc(ch, fp);
 	cmd_name[i] = 0;
-	return i == 0 ? NULL : strdup(cmd_name);
+	return i == 0 ? NULL : _strdup(cmd_name);
 
 }
 
