@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.329
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "virtual_machine", "virtual_machine\virtual_machine.vcxproj", "{199C6A91-5B0A-42E4-883C-CA63CE0FB629}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B2D70F2C-8E42-4E34-A9C9-DBD127BE0DFC} = {B2D70F2C-8E42-4E34-A9C9-DBD127BE0DFC}
+		{7936A3C9-193D-4A3B-AD17-A0119729F8F0} = {7936A3C9-193D-4A3B-AD17-A0119729F8F0}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_vm", "test_vm\test_vm.vcxproj", "{24B45F15-62F8-48F4-B91C-20487E688BF4}"
 	ProjectSection(ProjectDependencies) = postProject

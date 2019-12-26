@@ -160,6 +160,11 @@
     <ClCompile Include="table.c" />
     <ClCompile Include="table_dll.c" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\utils\utils.vcxproj">
+      <Project>{7936a3c9-193d-4a3b-ad17-a0119729f8f0}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

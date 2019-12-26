@@ -48,7 +48,12 @@ void disassembly(uint8_t *memory, size_t size, int mode) {
 		}
 		else {
 			uint dword = *((uint32_t*)&(memory[i]));
-			if (isprint(dword) || isspace(dword)) printf("%c\n", dword);
+      if (
+        (dword >= 0 && dword <= 255) && (isprint(dword) || isspace(dword))
+        )
+      {
+        printf("%c\n", dword);
+      }
 			else printf("0x%08x\n", dword);
 			i += 4;
 		}

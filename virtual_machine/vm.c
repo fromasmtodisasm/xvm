@@ -27,7 +27,7 @@ void print_commands() {
 		);
 }
 int load_table(char *name) {
-	HMODULE table_lib = LoadLibrary(name);
+	HMODULE table_lib = LoadLibraryA(name);
 	if (!table_lib) return FALSE;
 	get_table = (GetTable)GetProcAddress(table_lib, "get_table");
 	get_size = (GetSize)GetProcAddress(table_lib, "get_size");
