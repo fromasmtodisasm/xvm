@@ -3,8 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-/*
-#ifdef WIN32
+#ifdef _WIN32
 	#ifdef VIRTUALMACHINE_EXPORTS 
 		#define VM_API __declspec(dllexport)
 	#else
@@ -13,7 +12,6 @@
 #else
 	#define VM_API
 #endif
-*/
 
 /* DEFINES */
 #define REGS_COUNT 8
@@ -92,25 +90,25 @@ typedef struct vm_t
 #define peek_stack_dword(vm,n) (((uint*)(vm->stack->ram))[(vm->cpu->regs[SP]) + n])
 #define peek_stack_ref(vm,n) &(((uint*)(vm->stack->ram))[(vm->cpu->regs[SP]) + n])
 
-void print_commands();
+VM_API void print_commands();
 
-void dump_cpu(vm_t * vm);
+VM_API void dump_cpu(vm_t * vm);
 
 /* block of commands for processor */
 
-int vm_init(char * table_name);
+VM_API int vm_init(char * table_name);
 
-void vm_reset(vm_t * cpu);
+VM_API void vm_reset(vm_t * cpu);
 
-void vm_setProgram(vm_t * vm, uint8_t * program, size_t size);
+VM_API void vm_setProgram(vm_t * vm, uint8_t * program, size_t size);
 
-cpu_t * vm_createCpu();
+VM_API cpu_t * vm_createCpu();
 
-memory_t * vm_createMemory(uint8_t * ram, size_t size);
+VM_API memory_t * vm_createMemory(uint8_t * ram, size_t size);
 
-vm_t * vm_create(memory_t * program, size_t stack_size);
+VM_API vm_t * vm_create(memory_t * program, size_t stack_size);
 
-int vm_run(vm_t * vm);
+VM_API int vm_run(vm_t * vm);
 
 
 
